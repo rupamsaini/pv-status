@@ -1,12 +1,12 @@
 {
-  "lastUpdated": "2025-11-21T06:54:16Z",
+  "lastUpdated": "2025-11-21T07:12:32Z",
   "services": [
   {
     "name": "Main Website",
     "url": "https://login.devpropvivo.com/login",
     "status": "down",
     "statusCode": 000000,
-    "responseTime": 168
+    "responseTime": 238
   }
 ,
   {
@@ -14,7 +14,7 @@
     "url": "https://api.example.com",
     "status": "down",
     "statusCode": 000000,
-    "responseTime": 62
+    "responseTime": 29
   }
 ,
   {
@@ -22,7 +22,7 @@
     "url": "https://blog.example.com",
     "status": "down",
     "statusCode": 000000,
-    "responseTime": 62
+    "responseTime": 31
   }
 
   ]
