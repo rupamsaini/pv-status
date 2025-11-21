@@ -22,23 +22,24 @@ jobs:
       - name: Check website status
         run: |
           # Configuration - Add your websites here
-          declare -A SERVICES=(
-            ["Main Website"]="https://login.devpropvivo.com/login"
-            ["API Server"]="https://api.example.com"
-            ["Blog"]="https://blog.example.com"
-          )
+          cat > services.txt << 'EOL'
+          Main Website|https://login.devpropvivo.com/login
+          API Server|https://api.example.com
+          Blog|https://blog.example.com
+          EOL
           
-          # Create status data
+          # Start JSON
           echo "{" > status.json
-          echo '  "lastUpdated": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'",' >> status.json
-          echo '  "services": [' >> status.json
+          echo "  \"lastUpdated\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"," >> status.json
+          echo "  \"services\": [" >> status.json
           
+          # Process services
           FIRST=true
-          for name in "${!SERVICES[@]}"; do
-            url="${SERVICES[$name]}"
+          while IFS='|' read -r name url; do
+            [ -z "$name" ] && continue
             
             if [ "$FIRST" = false ]; then
-              echo "    ," >> status.json
+              echo "," >> status.json
             fi
             FIRST=false
             
@@ -54,18 +55,26 @@ jobs:
               STATUS="down"
             fi
             
-            echo "    {" >> status.json
-            echo '      "name": "'"$name"'",' >> status.json
-            echo '      "url": "'"$url"'",' >> status.json
-            echo '      "status": "'"$STATUS"'",' >> status.json
-            echo '      "statusCode": '"$HTTP_CODE"',' >> status.json
-            echo '      "responseTime": '"$RESPONSE_TIME" >> status.json
-            echo -n "    }" >> status.json
-          done
+            cat >> status.json << EOF
+            {
+              "name": "$name",
+              "url": "$url",
+              "status": "$STATUS",
+              "statusCode": $HTTP_CODE,
+              "responseTime": $RESPONSE_TIME
+            }
+          EOF
+          echo -n "" >> status.json
           
+          done < services.txt
+          
+          # Close JSON
           echo "" >> status.json
           echo "  ]" >> status.json
           echo "}" >> status.json
+          
+          # Validate JSON
+          cat status.json
           
       - name: Generate HTML page
         run: |
