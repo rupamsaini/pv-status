@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            margin-bottom: 40px;
+        }
+
+        .overall-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .overall-status.all-operational {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .overall-status.some-down {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+
+        .overall-status h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .service {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .service:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .service-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge.operational {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-badge.down {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.operational {
+            background: #38a169;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.down {
+            background: #e53e3e;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .service-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            color: #718096;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 14px;
+            margin-top: 32px;
+        }
+
+        .auto-refresh {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>System Status</h1>
+        <p class="subtitle">Current operational status of our services</p>
+
+        <div id="overallStatus" class="overall-status">
+            <h2>Loading...</h2>
+        </div>
+
+        <div id="services"></div>
+
+        <div class="last-updated" id="lastUpdated"></div>
+        <div class="auto-refresh">Auto-refreshes every 5 minutes via GitHub Actions</div>
+    </div>
+
+    <script>
+        async function loadStatus() {
+            try {
+                const response = await fetch('status.json?t=' + Date.now());
+                const data = await response.json();
+                
+                // Check overall status
+                const allOperational = data.services.every(s => s.status === 'operational');
+                const overallDiv = document.getElementById('overallStatus');
+                
+                if (allOperational) {
+                    overallDiv.className = 'overall-status all-operational';
+                    overallDiv.innerHTML = '<h2>✓ All Systems Operational</h2><p>Everything is running smoothly</p>';
+                } else {
+                    overallDiv.className = 'overall-status some-down';
+                    overallDiv.innerHTML = '<h2>⚠ Some Systems Down</h2><p>We are experiencing issues</p>';
+                }
+                
+                // Render services
+                const servicesHTML = data.services.map(service => `
+                    <div class="service">
+                        <div class="service-header">
+                            <div class="service-name">${service.name}</div>
+                            <span class="status-badge ${service.status}">
+                                <span class="status-dot ${service.status}"></span>
+                                ${service.status === 'operational' ? 'Operational' : 'Down'}
+                            </span>
+                        </div>
+                        <div class="service-details">
+                            <div class="detail-item">
+                                <span class="detail-label">URL</span>
+                                <span class="detail-value">${service.url}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Response Time</span>
+                                <span class="detail-value">${service.responseTime}ms</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status Code</span>
+                                <span class="detail-value">${service.statusCode}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('services').innerHTML = servicesHTML;
+                
+                const lastUpdated = new Date(data.lastUpdated);
+                document.getElementById('lastUpdated').textContent = 
+                    `Last checked: ${lastUpdated.toLocaleString()}`;
+                    
+            } catch (e) {
+                console.error('Error loading status:', e);
+                document.getElementById('overallStatus').innerHTML = 
+                    '<h2>Error Loading Status</h2><p>Please refresh the page</p>';
+            }
+        }
+        
+        loadStatus();
+        // Refresh page data every 30 seconds to catch new GitHub Actions updates
+        setInterval(loadStatus, 30000);
+    </script>
+</body>
+</html>
