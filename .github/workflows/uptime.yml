@@ -55,15 +55,13 @@ jobs:
               STATUS="down"
             fi
             
-            cat >> status.json << EOF
-            {
-              "name": "$name",
-              "url": "$url",
-              "status": "$STATUS",
-              "statusCode": $HTTP_CODE,
-              "responseTime": $RESPONSE_TIME
-            }
-EOF
+            echo "    {" >> status.json
+            echo "      \"name\": \"$name\"," >> status.json
+            echo "      \"url\": \"$url\"," >> status.json
+            echo "      \"status\": \"$STATUS\"," >> status.json
+            echo "      \"statusCode\": $HTTP_CODE," >> status.json
+            echo "      \"responseTime\": $RESPONSE_TIME" >> status.json
+            echo "    }" >> status.json
           done < services.txt
           
           # Close JSON
