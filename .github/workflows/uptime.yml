@@ -128,7 +128,8 @@ jobs:
                   const lu = document.getElementById('lastUpdated');
                   if (data.lastUpdated) lu.textContent = 'Last checked: ' + new Date(data.lastUpdated).toLocaleString();
                 }catch(err){
-                  document.getElementById('services').innerHTML = '<div style="color:#b91c1c">Error loading status2222222</div>';
+                console.log(err);
+                  document.getElementById('services').innerHTML = '<div style="color:#b91c1c">Error loading status</div>';
                 }
               }
 
