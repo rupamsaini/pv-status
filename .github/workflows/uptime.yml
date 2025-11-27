@@ -1,4 +1,3 @@
-# .github/workflows/uptime.yml
 name: Uptime Monitor
 
 on:
