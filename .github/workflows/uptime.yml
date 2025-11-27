@@ -21,8 +21,10 @@ jobs:
       - name: Check website status
         run: |
           # Configuration - Add your websites here
+          # Format: Name|URL|ignore_auth (ignore_auth: true to treat 401/403 as operational, false otherwise)
           cat > services.txt << 'EOL'
-          Main Website|https://login.devpropvivo.com/login
+          Main Website|https://login.devpropvivo.com/login|false
+          API Endpoint|https://afshanassociation.devpropvivo.com/Dashboard|true
           EOL
           
           # Start JSON
@@ -32,8 +34,10 @@ jobs:
           
           # Process services
           FIRST=true
-          while IFS='|' read -r name url; do
+          while IFS='|' read -r name url ignore_auth; do
             [ -z "$name" ] && continue
+            # Default ignore_auth to false if not provided
+            ignore_auth=${ignore_auth:-false}
             
             if [ "$FIRST" = true ]; then
               FIRST=false
@@ -57,7 +61,10 @@ jobs:
             RESPONSE_TIME=$((END - START))
             
             # Check if status code indicates operational (200-399)
+            # For websites with ignore_auth=true, also treat 401/403 as operational (server is responding, just requires auth)
             if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+              STATUS="operational"
+            elif [ "$ignore_auth" = "true" ] && ( [ "$HTTP_CODE" -eq 401 ] || [ "$HTTP_CODE" -eq 403 ] ); then
               STATUS="operational"
             else
               STATUS="down"
