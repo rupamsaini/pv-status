@@ -23,8 +23,6 @@ jobs:
           # Configuration - Add your websites here
           cat > services.txt << 'EOL'
           Main Website|https://login.devpropvivo.com/login
-          API Server|https://api.example.com
-          Blog|https://blog.example.com
           EOL
           
           # Start JSON
@@ -45,12 +43,20 @@ jobs:
             
             # Check service
             START=$(date +%s%3N)
-            HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 "$url" || echo "0")
-            # Force integer format (remove leading zeros if any, though curl shouldn't output them for status)
-            HTTP_CODE=$((10#$HTTP_CODE))
+            # Use curl with follow redirects and ignore SSL errors for better compatibility
+            HTTP_CODE=$(curl -o /dev/null -s -L -k -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
+            # Extract numeric value, defaulting to 0 if empty or invalid
+            if [ -z "$HTTP_CODE" ] || [ "$HTTP_CODE" = "000" ]; then
+              HTTP_CODE=0
+            else
+              # Remove any non-numeric characters and convert to integer
+              HTTP_CODE=$(echo "$HTTP_CODE" | tr -d '\n\r' | grep -oE '^[0-9]+$' || echo "0")
+              HTTP_CODE=$((10#$HTTP_CODE))
+            fi
             END=$(date +%s%3N)
             RESPONSE_TIME=$((END - START))
             
+            # Check if status code indicates operational (200-399)
             if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
               STATUS="operational"
             else
