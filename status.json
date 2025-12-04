@@ -1,12 +1,12 @@
 {
-  "lastUpdated": "2025-12-04T11:14:07Z",
+  "lastUpdated": "2025-12-04T11:32:12Z",
   "services": [
     {
       "name": "Main Website",
       "url": "https://login.devpropvivo.com/login",
       "status": "operational",
       "statusCode": 200,
-      "responseTime": 145
+      "responseTime": 168
     }
 ,
     {
@@ -14,7 +14,7 @@
       "url": "https://afshanassociation.devpropvivo.com/Dashboard",
       "status": "operational",
       "statusCode": 200,
-      "responseTime": 247
+      "responseTime": 277
     }
 
   ]
