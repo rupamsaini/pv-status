@@ -1,12 +1,12 @@
 {
-  "lastUpdated": "2025-12-10T15:38:50Z",
+  "lastUpdated": "2025-12-10T15:53:41Z",
   "services": [
     {
       "name": "Main Website",
       "url": "https://login.devpropvivo.com/login",
       "status": "operational",
       "statusCode": 200,
-      "responseTime": 135
+      "responseTime": 138
     }
 ,
     {
