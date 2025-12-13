@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-12-13T22:56:12Z",
+  "lastUpdated": "2025-12-13T23:19:51Z",
   "services": [
     {
       "name": "Main Website",
@@ -14,7 +14,7 @@
       "url": "https://afshanassociation.devpropvivo.com/Dashboard",
       "status": "down",
       "statusCode": 0,
-      "responseTime": 10013
+      "responseTime": 10012
     }
 
   ]
